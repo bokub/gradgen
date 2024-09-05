@@ -8,12 +8,16 @@ export default {
 
     // Fetch original badge
     const response = await fetch(`https://${isFlat ? 'flat.' : ''}badgen.net${url.pathname}${url.search}`);
-
-    // Apply gradient
     const svgBadge = await response.text();
-    const gradientBadge = applyGradient(svgBadge, gradient);
 
-    // Return the new badge
-    return new Response(gradientBadge, response);
+    if (svgBadge.startsWith('<svg')) {
+      // Apply gradient
+      const badgeWithGradient = applyGradient(svgBadge, gradient);
+      // Return the new badge
+      return new Response(badgeWithGradient, response);
+    }
+
+    // Redirect to GitHub if the response is not a badge
+    return Response.redirect('https://github.com/bokub/gradgen?tab=readme-ov-file#-gradgen', 301);
   },
 };
